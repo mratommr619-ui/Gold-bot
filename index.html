@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Gold Price Prediction Bot</title>
+    <style>
+        body { 
+            font-family: Arial; 
+            padding:20px; 
+            background:#f3f3f3;
+        }
+        #box {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            margin:auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            background:#007bff;
+            color:white;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <h2>Gold Price Prediction</h2>
+        <button onclick="predict()">Get Prediction</button>
+        <div id="result" style="margin-top:20px;"></div>
+    </div>
+
+    <script>
+        async function predict() {
+            document.getElementById("result").innerHTML = "Loading...";
+
+            const res = await fetch("https://YOUR-RENDER-URL/predict");
+            const data = await res.json();
+
+            document.getElementById("result").innerHTML = `
+                <b>Current Price:</b> ${data.price} <br><br>
+                <b>Prediction:</b> <br> ${data.forecast}
+            `;
+        }
+    </script>
+</body>
+</html>
