@@ -6,23 +6,24 @@ import requests
 
 app = FastAPI()
 
-# CORS - frontend fetch safe
+# ---------- CORS Middleware ----------
+# Acode preview / Browser frontend fetch အတွက်
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # အားလုံး allow
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# OpenAI API Key from Environment Variable
+# ---------- OpenAI API Key ----------
 openai_api_key = os.getenv("OPENAI_API_KEY")
 if not openai_api_key:
     raise Exception("OPENAI_API_KEY environment variable not set")
 
 client = OpenAI(api_key=openai_api_key)
 
-# Example Gold API
+# ---------- Gold Price Fetch ----------
 GOLD_API = "https://api.metals.live/v1/spot"
 
 def get_gold_price():
@@ -30,15 +31,17 @@ def get_gold_price():
         r = requests.get(GOLD_API, timeout=5)
         r.raise_for_status()
         return r.json()[0]["gold"]
-    except Exception as e:
+    except Exception:
         return None
 
+# ---------- Predict Endpoint ----------
 @app.get("/predict")
 def predict():
     price = get_gold_price()
     if not price:
         return {"error": "Failed to fetch gold price"}
 
+    # Prompt for OpenAI
     prompt = f"""
     You are a financial bot.
     Current gold price: {price}
@@ -55,4 +58,8 @@ def predict():
     )
 
     forecast = response.choices[0].message["content"]
-    return {"price": price, "forecast": forecast}
+
+    return {
+        "price": price,
+        "forecast": forecast
+    }

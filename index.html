@@ -38,8 +38,13 @@
         async function predict() {
             document.getElementById("result").innerHTML = "Loading...";
 
-            const res = await fetch("https://gold-bot-2of4.onrender.com/predict");
-            const data = await res.json();
+            async function getForecast() {
+    const res = await fetch("https://gold-bot-2of4.onrender.com/predict");
+    const data = await res.json();
+    console.log(data);
+}
+
+getForecast();
 
             document.getElementById("result").innerHTML = `
                 <b>Current Price:</b> ${data.price} <br><br>
