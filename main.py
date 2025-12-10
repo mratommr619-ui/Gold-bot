@@ -7,10 +7,9 @@ import requests
 app = FastAPI()
 
 # ---------- CORS Middleware ----------
-# Frontend / Acode preview / Browser fetch အတွက်
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # အားလုံး allow
+    allow_origins=["*"],  # All origins allowed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,9 +18,8 @@ app.add_middleware(
 # ---------- OpenAI API Key ----------
 openai_api_key = os.getenv("OPENAI_API_KEY")
 if not openai_api_key:
-    raise Exception("OPENAI_API_KEY environment variable not set")
-
-client = OpenAI(api_key=openai_api_key)
+    print("WARNING: OPENAI_API_KEY not set. AI forecast will fallback.")
+client = OpenAI(api_key=openai_api_key) if openai_api_key else None
 
 # ---------- Gold Price Fetch Function ----------
 GOLD_API = "https://api.metals.live/v1/spot"
@@ -31,15 +29,14 @@ def get_gold_price():
         r = requests.get(GOLD_API, timeout=10)
         r.raise_for_status()
         data = r.json()
-        # Metals.live format check
         if len(data) > 0 and "gold" in data[0]:
             return data[0]["gold"]
         else:
-            return 1950.00  # fallback value
+            return 1950.00  # fallback
     except Exception:
-        return 1950.00  # fallback value if API fails
+        return 1950.00  # fallback
 
-# ---------- Root Endpoint (Optional) ----------
+# ---------- Root Endpoint ----------
 @app.get("/")
 def root():
     return {"message": "Gold Bot is running. Use /predict endpoint."}
@@ -49,7 +46,6 @@ def root():
 def predict():
     price = get_gold_price()
 
-    # Prompt for OpenAI
     prompt = f"""
     You are a financial bot.
     Current gold price: {price}
@@ -60,12 +56,17 @@ def predict():
     - Risk note
     """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}]
-    )
-
-    forecast = response.choices[0].message["content"]
+    if client:
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            forecast = response.choices[0].message["content"]
+        except Exception as e:
+            forecast = f"AI forecast failed: {str(e)}"
+    else:
+        forecast = "AI forecast not available. Set OPENAI_API_KEY."
 
     return {
         "price": price,
