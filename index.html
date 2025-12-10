@@ -1,56 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Gold Price Prediction Bot</title>
-    <style>
-        body { 
-            font-family: Arial; 
-            padding:20px; 
-            background:#f3f3f3;
-        }
-        #box {
-            max-width: 600px;
-            background: white;
-            padding: 20px;
-            margin:auto;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #ccc;
-        }
-        button {
-            padding: 10px 20px;
-            background:#007bff;
-            color:white;
-            border:none;
-            border-radius:6px;
-            cursor:pointer;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gold Bot Forecast</title>
 </head>
 <body>
-    <div id="box">
-        <h2>Gold Price Prediction</h2>
-        <button onclick="predict()">Get Prediction</button>
-        <div id="result" style="margin-top:20px;"></div>
-    </div>
+<h1>Gold Bot Forecast</h1>
+<button id="getForecast">Get Forecast</button>
+<pre id="output"></pre>
 
-    <script>
-        async function predict() {
-            document.getElementById("result").innerHTML = "Loading...";
-
-            async function getForecast() {
-    const res = await fetch("https://gold-bot-2of4.onrender.com/predict");
-    const data = await res.json();
-    console.log(data);
-}
-
-getForecast();
-
-            document.getElementById("result").innerHTML = `
-                <b>Current Price:</b> ${data.price} <br><br>
-                <b>Prediction:</b> <br> ${data.forecast}
-            `;
-        }
-    </script>
+<script>
+document.getElementById("getForecast").addEventListener("click", async () => {
+    try {
+        const res = await fetch("https://gold-bot-2of4.onrender.com/predict");
+        const data = await res.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+        document.getElementById("output").textContent = err;
+    }
+});
+</script>
 </body>
 </html>

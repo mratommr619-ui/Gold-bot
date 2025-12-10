@@ -7,7 +7,7 @@ import requests
 app = FastAPI()
 
 # ---------- CORS Middleware ----------
-# Acode preview / Browser frontend fetch အတွက်
+# Frontend / Acode preview / Browser fetch အတွက်
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # အားလုံး allow
@@ -23,7 +23,7 @@ if not openai_api_key:
 
 client = OpenAI(api_key=openai_api_key)
 
-# ---------- Gold Price Fetch ----------
+# ---------- Gold Price Fetch Function ----------
 GOLD_API = "https://api.metals.live/v1/spot"
 
 def get_gold_price():
@@ -33,6 +33,11 @@ def get_gold_price():
         return r.json()[0]["gold"]
     except Exception:
         return None
+
+# ---------- Root Endpoint (Optional) ----------
+@app.get("/")
+def root():
+    return {"message": "Gold Bot is running. Use /predict endpoint."}
 
 # ---------- Predict Endpoint ----------
 @app.get("/predict")
