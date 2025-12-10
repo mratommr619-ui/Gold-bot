@@ -38,7 +38,7 @@
         async function predict() {
             document.getElementById("result").innerHTML = "Loading...";
 
-            const res = await fetch("https://YOUR-RENDER-URL/predict");
+            const res = await fetch("https://gold-bot-2of4.onrender.com/predict");
             const data = await res.json();
 
             document.getElementById("result").innerHTML = `
