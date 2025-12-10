@@ -13,7 +13,7 @@
 <script>
 document.getElementById("getForecast").addEventListener("click", async () => {
     try {
-        const res = await fetch("https://gold-bot-2of4.onrender.com/predict");
+        const res = await fetch("https://gold-bot-1.onrender.com/predict");
         const data = await res.json();
         document.getElementById("output").textContent = JSON.stringify(data, null, 2);
     } catch (err) {
