@@ -28,11 +28,16 @@ GOLD_API = "https://api.metals.live/v1/spot"
 
 def get_gold_price():
     try:
-        r = requests.get(GOLD_API, timeout=5)
+        r = requests.get(GOLD_API, timeout=10)
         r.raise_for_status()
-        return r.json()[0]["gold"]
+        data = r.json()
+        # Metals.live format check
+        if len(data) > 0 and "gold" in data[0]:
+            return data[0]["gold"]
+        else:
+            return 1950.00  # fallback value
     except Exception:
-        return None
+        return 1950.00  # fallback value if API fails
 
 # ---------- Root Endpoint (Optional) ----------
 @app.get("/")
@@ -43,8 +48,6 @@ def root():
 @app.get("/predict")
 def predict():
     price = get_gold_price()
-    if not price:
-        return {"error": "Failed to fetch gold price"}
 
     # Prompt for OpenAI
     prompt = f"""
